@@ -1,0 +1,115 @@
+/*8. Select contact firstname, contact lastname and credit limit for all customers where credit
+limit > 50000 ordered by the last name, then the first name. (85)*/
+SELECT contactfirstname, contactlastname, creditlimit
+FROM Customers
+WHERE creditlimit > 50000;
+
+/*9. Select the customer name of customers who do not have a credit limit (0.00) order by
+customerName (24) */
+SELECT contactfirstname, contactlastname
+FROM Customers
+WHERE creditlimit = 0;
+
+/*10. List the city, phone, address, state, country, postal code, and territory of all offices not in
+the USA (4)  */
+SELECT officecode
+FROM Offices
+WHERE country!='USA';
+
+/*11. List the order date, required date, shipped date, status, and comments from all orders
+made between June 16, 2014 and July 7, 2014 (8)  */
+SELECT ordernumber
+FROM Orders
+WHERE orderdate BETWEEN '2014-06-16' AND '2014-07-07';
+
+/*12. List the product code, product name, product vendor, and the quantity in stock of all
+products that we need to reorder (quantityinstock < 1000) (12)  */
+SELECT productname
+FROM Products
+WHERE quantityinstock < 1000;
+
+/*13. List the order number, shipped date, and required date of all orders that shipped after
+the required date (1)  */
+SELECT ordernumber
+FROM Orders
+WHERE shippeddate > requireddate;
+
+/*14. List the customer name of all customers who have the word ‘Mini’ in their name (10)  */
+SELECT customername
+FROM Customers
+WHERE customername like '%Mini%';
+
+/*15. List the product name of all products supplied by ‘Highway 66 Mini Classics’ (9)  */
+SELECT productname
+FROM Products
+WHERE productVendor = 'Highway 66 Mini Classics';
+
+/*16. List the product name and product vendor of all products not supplied by ‘Highway 66
+Mini Classics’ order by productName (101)  */
+SELECT productname
+FROM Products
+WHERE productvendor != 'Highway 66 Mini Classics';
+
+/*17. List the last name and first name of all employees that do not have a manager (1)  */
+SELECT employeeNumber, firstname, lastname
+FROM Employees
+WHERE reportsto IS NULL;
+
+
+/*18.	Display the order number, order date, status, quantity ordered, price each, and product name for every
+  item within every order for order numbers 10270, 10272, 10279 (23)
+Hint: this can be done two ways. Try both. Which is easier if you have many selection criteria? **/
+SELECT ordernumber,orderdate,status,quantityordered, priceeach, productname FROM OrderDetails
+INNER JOIN Orders USING(ordernumber)
+INNER JOIN Products USING (productCode)
+WHERE orderNumber = 10270 OR ordernumber = 10272 OR ordernumber = 10279;
+
+/*19.	List the product lines, the first 50 characters of the product line’s text description and vendors that
+  supply the products in that product line ordered by product Line and product Vendor. (65) The Derby database gives us
+  the SUBSTR function that you can read about here.
+ */
+SELECT DISTINCT productline, SUBSTR(textdescription, 1,50), productvendor FROM productlines
+INNER JOIN Products USING (productline) ORDER BY productline, productvendor;
+
+/*20.	Select the customer name and their state for all customers that live in the same state as one of our offices
+  ordered by customerName (26)
+ */
+SELECT customername, Customers.state
+FROM Customers INNER JOIN Offices
+ON Customers.state = Offices.state ORDER BY customername;
+
+/*21.	Select the customer name of all customers who live in the same state as their employee representative
+  works (26)
+ */
+SELECT customerName FROM Customers
+INNER JOIN EMPLOYEES
+ON CUSTOMERS.SALESREPEMPLOYEENUMBER = EMPLOYEENUMBER
+INNER JOIN OFFICES ON
+EMPLOYEES.OFFICECODE = OFFICES.OFFICECODE AND CUSTOMERS.state = OFFICES.state
+
+/*22.	Select customer name, order date, quantity ordered, product line, product name for all orders by a customer
+  with the string ‘Decorations’ in their name, made and shipped during odd-numbered months in 2015 ordered by customer
+  name and order date. SQL has a mod function that takes two arguments: the number that you want to perform modular
+  division on, and the divisor. For instance mod (8, 3) will return 2. (28)
+ */
+SELECT customername, orderdate, quantityordered, productline, productname
+FROM customers
+INNER JOIN orders using (customernumber)
+INNER JOIN orderdetails using (ordernumber)
+INNER JOIN products using (productcode)
+WHERE customername like '%Decorations%'
+AND EXTRACT(YEAR FROM orderdate) = 2015
+AND MOD(EXTRACT(MONTH FROM orderdate), 2) = 1
+ORDER BY customername, orderdate;
+
+/*23.List the product name and product code of products that didn't sell (1) */
+SELECT productname, ordernumber
+FROM Products LEFT OUTER JOIN OrderDetails
+ON Products.productcode = OrderDetails.productcode
+
+/*24. List the name of all customers and first and last name of their sales rep even if they don’t have a
+  sales rep (122)
+ */
+SELECT customername, lastname, firstname
+FROM Customers LEFT OUTER JOIN Employees
+ON Customers.salesrepemployeenumber = Employees.employeenumber;
